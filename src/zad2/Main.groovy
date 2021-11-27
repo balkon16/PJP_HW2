@@ -7,44 +7,76 @@
 // TODO: napisać README
 package zad2
 
-static parseInput(input, method){
-    try {
-        return new Tuple2(true, method(input))
-    } catch (ignored) {
-        println(ignored) // debug
-        return new Tuple2(false, input)
-    }
-}
+import org.codehaus.groovy.GroovyException
 
+import javax.swing.JOptionPane
 
-static getData(elemType = String, String input) {
-    // TODO: co zrobić z pustymi ciągami znaków?
-//    input = input.trim()
-//    if (input.length() == 0) return new Tuple2(false, ["No elements specified."])
+static parseInput(input, method) {
+    input = input.split(/\s+/)
     def correctElements = []
     def incorrectElements = []
-    def elements = input.split(/\s+/)
-    switch (elemType) {
-        case Integer:
-            elements.each { println(parseInput(it, Integer.&valueOf))}
-            println("Integer")
-            break
-        case BigDecimal:
-            println("BigDecimal")
-            break
-        case String:
-            print("String")
-            break
-        default:
-            throw GroovyException("Unknown parameter value: $elemType")
+    def success = true
+    input.each {
+        try {
+            correctElements.add(method(it))
+        } catch (ignored) {
+            success = false
+            incorrectElements.add(it)
+        }
     }
+    return new Tuple3(success, correctElements, incorrectElements)
 }
 
-getData(Integer, "10 11 12")
 
-//println(BigDecimal)
-//println(Integer)
-//println(String)
+static getDataHelper(elemType = String, String input) {
+    input = input.trim()
+    // TODO: co zrobić z pustymi ciągami znaków?
+    if (input.length() == 0) return new Tuple2(false, ["No elements specified."])
+    def parsingResult
+    switch (elemType) {
+        case Integer:
+            parsingResult = parseInput(input, Integer.&valueOf)
+            break
+        case BigDecimal:
+            parsingResult = parseInput(input, BigDecimal::new)
+            break
+        case String:
+            parsingResult = parseInput(input, String::new)
+            break
+        default:
+            throw new GroovyException("Unknown parameter value: $elemType")
+    }
+    return new Tuple2(parsingResult[0], (parsingResult[0]) ? parsingResult[1] : parsingResult[2])
+}
+
+static List getData(elemType, input) {
+    def result = getDataHelper(elemType, input)
+    if (result[0] == true) return result[1].findAll()
+    else return []
+}
 
 
- 
+//myList = getDataHelper(BigDecimal, "doggie cat milk")[1]
+//println(myList.every )
+//println(myList.findAll())
+//println(myList.findAll() { it.size() > 1 })
+
+println(getData(Integer, "1 -100 002 3 00004 1245") {it > 1}) //To nie działa.
+println(getData(Integer, "1 -100 002 3 00004 1245").findAll() {it > 1}) // To działa.
+
+
+//while (true) {
+//    String userInput = JOptionPane.showInputDialog("Please specify your data (separated by a whitespace):")
+//    if (userInput == null) {
+//        println("Closing...")
+//        break
+//    }
+//    def parsingResult = getDataHelper(userInput)
+//    if (parsingResult[0] == true) {
+//        println("Your data: " + parsingResult[1])
+//    } else {
+//        println("Incorrect input. The following entries cannot be parsed to integers:")
+//        parsingResult[1].each { println("\t" + it) }
+//    }
+//
+//}
