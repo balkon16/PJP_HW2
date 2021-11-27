@@ -4,45 +4,50 @@
  *
  */
 
-// TODO: napisać README
-// TODO: regex do znajdowania niepasujących elementów (np. findAll z !\d+)
 package zad1
 
 import javax.swing.JOptionPane;
 
-// TODO: zakres INT to od -2,147,483,648 do 2,147,483,647. Obecnie akceptuje wszystkie.
+static getParsingResult(String input) {
+    input = input.trim()
+    if (input.length() == 0) return new Tuple2(false, ["No elements specified."])
 
-static boolean isValidInput(String input) {
-    def pattern = /^(-?\d+ ?)+$/
-    if ((input == '') | (input == null)) return false
-    return input.trim() ==~ pattern
+    def isSuccess = true
+    def correctElements = []
+    def incorrectElements = []
+    input.split(/\s+/).each {
+        try {
+            correctElements.add(it.toInteger())
+        } catch (ignored) {
+            isSuccess = false
+            incorrectElements.add(it)
+        }
+    }
+    if (isSuccess) {
+        return new Tuple(isSuccess, correctElements)
+    }
+    return new Tuple(isSuccess, incorrectElements)
 }
 
-static getInts(String input) {
-    return input.split(' ')*.toInteger()
+// for the purposes of compatability with the task's instructions
+static Integer[] getInts(userInput) {
+    def result = getParsingResult(userInput)
+    if (result[0] == true) return result[1]
+    else return null
 }
-
 
 while (true) {
     String userInput = JOptionPane.showInputDialog("Please specify your integers (separated by a whitespace):")
-    if (isValidInput(userInput)) {
-        println(getInts(userInput.trim()))
-    } else {
-        def msgOnFail = '''Provided incorrect input. Typical incorrect cases:
-> other than integer numeric types, e.g. 10.5, 7.12, 0.555, -10.12, -5,125, 9.156
-> strings, e.g. "my string", "my_string_with_underscores", "false"'''
-
-        JOptionPane.showMessageDialog(null, msgOnFail)
-    }
-
     if (userInput == null) {
         println("Closing...")
         break
     }
-//    def parsedInput = validateAndTransformUserInput(productPrice)
-//    if (parsedInput[0]) {
-//        def productName = parsedInput[1][0]
-//        productsSummary[productName] = productsSummary.get(productName, 0) + parsedInput[1][1]
-//    }
+    def parsingResult = getParsingResult(userInput)
+    if (parsingResult[0] == true) {
+        println("Your integers: " + parsingResult[1])
+    } else {
+        println("Incorrect input. The following entries cannot be parsed to integers:")
+        parsingResult[1].each { println("\t" + it) }
+    }
 
 }
