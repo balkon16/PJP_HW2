@@ -4,7 +4,6 @@
  *
  */
 
-// TODO: napisać README
 package zad2
 
 import org.codehaus.groovy.GroovyException
@@ -46,7 +45,11 @@ static getDataHelper(elemType = String, String input) {
     return new Tuple2(parsingResult[0], (parsingResult[0]) ? parsingResult[1] : parsingResult[2])
 }
 
-static getData(elemType = String, input, Closure<Boolean> booleanClosure = {true}) {
+static getData(String input, Object elemType = String, Closure<Boolean> booleanClosure = { true }) {
+    if (elemType instanceof Closure) {
+        booleanClosure = elemType
+        elemType = String
+    }
     def result = getDataHelper(elemType, input)
     if (result[0] == true) return result[1].findAll(booleanClosure)
     else return null
@@ -55,7 +58,7 @@ static getData(elemType = String, input, Closure<Boolean> booleanClosure = {true
 def integerInput = "1 10 001 -102 -0005"
 def stringInput = "abba ghij def"
 def bigDecimalInput = "1.0 -15.1 1 301.2 001"
-println getData(Integer, integerInput) { it > 0 }
-//println getData(stringInput) { it.size() > 3 }   // słowa o długości większej od 3 (domyślny typ: String) // TODO: naprawić
-//println getData(stringInput)                          // dowolne napisy (słowa) // TODO: naprawić
-println getData(BigDecimal, bigDecimalInput)         // dowolne liczby
+println getData(integerInput, Integer) { it > 0 }
+println getData(stringInput) { it.size() > 3 }
+println getData(stringInput)
+println getData(bigDecimalInput, BigDecimal)
