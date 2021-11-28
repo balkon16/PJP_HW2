@@ -13,5 +13,5 @@ is returned.
 
 # Exercise no. 2
 Solution for the exercise no. 2 is located in teh `src/zad2` package. The aim of the exercise is to generalize the `getInts`
-function which is described in the `src/zad1` module). The generalized function should handle `String`s (the default case), `Integer`s, 
+function which is described in the `src/zad1` module. The generalized function should handle `String`s (the default case), `Integer`s, 
 and `BigDecimal`s. Additionally, it should accept an optional closure used for filtering elements.
